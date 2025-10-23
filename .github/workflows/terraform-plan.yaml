@@ -46,11 +46,13 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -no-color -out=tfplan
 
+      - name: Generate Plan Output
+        run: terraform show -no-color tfplan > plan.txt
+
       - name: Comment Plan on PR
+        if: success()
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           path: plan.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: success()
-        run: terraform show -no-color tfplan > plan.txt
