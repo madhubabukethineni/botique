@@ -1,0 +1,43 @@
+name: Terraform Apply
+
+on:
+  push:
+    branches:
+      - dev
+      - stage
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  terraform-apply:
+    name: Terraform Apply on Merge
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform-gke/envs/${{ github.ref_name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Terraform Init
+        run: terraform init -backend-config=../../backend/backend.tf
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve

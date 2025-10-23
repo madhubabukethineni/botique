@@ -1,0 +1,56 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - stage
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  terraform-plan:
+    name: Terraform Init & Plan
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform-gke/envs/${{ github.base_ref }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Terraform Init
+        run: terraform init -backend-config=../../backend/backend.tf
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -no-color -out=tfplan
+
+      - name: Comment Plan on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: plan.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: success()
+        run: terraform show -no-color tfplan > plan.txt
