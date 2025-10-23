@@ -19,7 +19,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: terraform-gke/envs/${{ github.base_ref }}
+        working-directory: ./envs/${{ github.base_ref }}
 
     steps:
       - name: Checkout repository
