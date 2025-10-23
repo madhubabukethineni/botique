@@ -1,15 +1,15 @@
 data "terraform_remote_state" "vpc_state" {
   backend = "gcs"
-  config = { bucket = "k8s-prep-terraform-states", prefix = "terraform/gke/k8s-prep-433307" }
+  config = { bucket = "terraform-backend-state-prod", prefix = "prod/terraform" }
 }
 
 data "terraform_remote_state" "subnet_state" {
   backend = "gcs"
-  config = { bucket = "k8s-prep-terraform-states", prefix = "terraform/gke/k8s-prep-433307" }
+  config = { bucket = "terraform-backend-state-prod", prefix = "prod/terraform" }
 }
 
 module "gke" {
-  source = "../../modules/gke_cluster"
+  source = "../../../modules/gke_cluster"
   project_id = var.project_id
   region = var.region
   cluster_name = var.cluster_name

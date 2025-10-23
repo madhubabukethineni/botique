@@ -17,16 +17,11 @@ jobs:
     name: Terraform Init & Plan
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: terraform-gke/envs/${{ github.base_ref }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
-        id: auth
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -37,20 +32,27 @@ jobs:
         with:
           terraform_version: 1.7.5
 
-      - name: Terraform Init
-        run: terraform init -backend-config=../../backend/backend.tf
+      - name: Terraform Plan All Modules
+        run: |
+          set -e
+          BASE_DIR=./envs/${{ github.base_ref }}
+          OUTPUT_FILE=all_plans.txt
+          echo "" > $OUTPUT_FILE
 
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -no-color -out=tfplan
+          for DIR in $(find "$BASE_DIR" -maxdepth 1 -mindepth 1 -type d); do
+            echo "===== Terraform Plan in $DIR =====" | tee -a $OUTPUT_FILE
+            cd "$DIR"
+            terraform init -backend-config=../../backend/backend.tf
+            terraform validate | tee -a ../../$OUTPUT_FILE
+            terraform plan -no-color -out=tfplan | tee -a ../../$OUTPUT_FILE
+            terraform show -no-color tfplan | tee -a ../../$OUTPUT_FILE
+            cd - > /dev/null
+            echo "" >> ../../$OUTPUT_FILE
+          done
 
       - name: Comment Plan on PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          path: plan.txt
+          path: ./envs/${{ github.base_ref }}/all_plans.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: success()
-        run: terraform show -no-color tfplan > plan.txt
