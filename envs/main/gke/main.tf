@@ -9,7 +9,7 @@ data "terraform_remote_state" "subnet_state" {
 }
 
 module "gke" {
-  source = "../../modules/gke_cluster"
+  source = "../../../modules/gke_cluster"
   project_id = var.project_id
   region = var.region
   cluster_name = var.cluster_name
