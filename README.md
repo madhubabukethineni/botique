@@ -1,4 +1,4 @@
-Terraform GKE starter for project k8s-prep-433307
+Terraform GKE starter for project <Project>
 
 Structure:
 - modules/: reusable child modules (vpc, subnet, gke_cluster, node_pool)
@@ -6,7 +6,7 @@ Structure:
 - backend/: central backend config (update bucket name)
 
 Defaults chosen:
-- project_id: k8s-prep-433307
+- project_id: <PRoject-ID>
 - region: asia-south1
 - zone: asia-south1-a
 - VPC CIDR defaults: 10.0.0.0/16 (you can customize in tfvars)
@@ -19,6 +19,6 @@ How to use:
    terraform init -backend-config="../../backend/backend.tf"
    terraform apply -var-file=terraform.tfvars
 3. Apply subsequent modules in order: vpc -> subnet -> gke -> node_pool
-4. After cluster creation run: gcloud container clusters get-credentials <cluster> --region asia-south1 --project k8s-prep-433307
+4. After cluster creation run: gcloud container clusters get-credentials <cluster> --region asia-south1 --project <Project-id>
 
 Note: This is a starter template — review variables and IAM before using in production.
