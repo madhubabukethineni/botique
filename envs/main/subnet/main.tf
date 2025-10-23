@@ -7,7 +7,7 @@ data "terraform_remote_state" "vpc_state" {
 }
 
 module "subnet" {
-  source = "../../modules/subnet"
+  source = "../../../modules/subnet"
   project_id = var.project_id
   region     = var.region
   name       = var.subnet_name
