@@ -1,8 +1,8 @@
 data "terraform_remote_state" "vpc_state" {
   backend = "gcs"
   config = {
-    bucket = "k8s-prep-terraform-states"
-    prefix = "terraform/gke/k8s-prep-433307"
+    bucket = "terraform-backend-state-prod"
+    prefix = "prod/terraform"
   }
 }
 
