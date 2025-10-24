@@ -3,7 +3,7 @@ name: Deploy Terraform on GCP (Dev/Test/Stage/Prod Environment)
 on:
   push:
     paths:
-      - 'envs/**/**/*.tfvars'  
+      - 'environments/**/**/*.tfvars'  
     branches:
       - main  # Trigger on push to the main branch
   pull_request:
@@ -11,7 +11,7 @@ on:
     branches:
       - main
     paths:
-      - 'envs/**/**/*.tfvars'  
+      - 'environments/**/**/*.tfvars'  
  
 jobs:
   plan:
