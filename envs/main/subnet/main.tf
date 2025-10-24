@@ -1,9 +1,5 @@
-data "terraform_remote_state" "vpc_state" {
-  backend = "gcs"
-  config = {
-    bucket = "terraform-backend-state-prod"
-    prefix = "prod/terraform"
-  }
+terraform {
+  backend "gcs" {}
 }
 
 module "subnet" {
