@@ -1,6 +1,5 @@
-data "terraform_remote_state" "gke_state" {
-  backend = "gcs"
-  config = { bucket = "terraform-backend-state-prod", prefix = "prod/terraform" }
+terraform {
+  backend "gcs" {}
 }
 
 module "node_pool" {
