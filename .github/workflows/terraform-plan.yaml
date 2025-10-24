@@ -3,25 +3,19 @@ name: Deploy Terraform on GCP (Dev/Test/Stage/Prod Environment)
 on:
   push:
     paths:
-      - 'environments/**/**/*.tfvars'  # Trigger only on .tfvars file changes
+      - 'environments/**/**/*.tfvars'  
     branches:
-      - dev  # Trigger on push to the dev branch
-      - test  # Trigger on push to the test branch
-      - stage # Trigger on push to the stage branch
       - main  # Trigger on push to the main branch
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
-      - dev
-      - test
-      - stage
       - main
     paths:
-      - 'environments/**/**/*.tfvars'  # Trigger on .tfvars file changes
+      - 'environments/**/**/*.tfvars'  
  
 jobs:
   plan:
-    name: 🕵🏼 🗺️ Check and Plan
+    name: Check and Plan
     permissions:
       contents: read
       id-token: write
