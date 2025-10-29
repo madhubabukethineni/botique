@@ -32,3 +32,7 @@ variable "secondary_ip_ranges" {
   }))
   default = []
 }
+variable "network_name" {
+  description = "The self link of the VPC network to which this subnet belongs."
+  type        = string
+}
