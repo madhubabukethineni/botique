@@ -7,8 +7,8 @@ module "gke" {
   project_id = var.project_id
   region = var.region
   cluster_name = var.cluster_name
-  network = var.network_name
-  subnet  = var.subnet_name
+  network_name = var.network_name
+  subnet_name = var.subnet_name
   cluster_secondary_range = var.cluster_secondary_range
   services_secondary_range = var.services_secondary_range
   enable_private_nodes = true

@@ -1,4 +1,4 @@
-name: Deploy Terraform on GCP (Dev/Test/Stage/Prod Environment)
+name: Deploy Terraform on GCP (PROD Environment)
  
 on:
   push:
