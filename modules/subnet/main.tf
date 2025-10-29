@@ -2,7 +2,7 @@ resource "google_compute_subnetwork" "this" {
   name                     = var.name
   project                  = var.project_id
   region                   = var.region
-  network                  = var.network_self_link
+  network                  = var.network_name
   ip_cidr_range            = var.ip_cidr_range
   private_ip_google_access = var.private_ip_google_access
 
