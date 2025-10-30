@@ -1,13 +1,12 @@
 name: Deploy Terraform on GCP (PROD Environment)
- 
+
 on:
   push:
-    paths:
-      - 'environments/**/**/*.tfvars'  
     branches:
-      - main  # Trigger on push to the main branch
-  
- 
+      - main
+    paths:
+      - 'environments/**/**/*.tfvars'  # Trigger only on .tfvars changes
+
 jobs:
   apply:
     name: Check and Apply
@@ -15,103 +14,91 @@ jobs:
       contents: read
       id-token: write
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }}  # Only run push events (PR merges)
- 
+
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout repository
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 2  # Fetch the last two commits to resolve HEAD~1
-       
-      - name: Get Target Branch
-        id: get_branch
+          fetch-depth: 0  # Full history for git diff
+
+      # Step 2: Set environment
+      - name: Set Target Environment
         run: |
-          if [ "${{ github.event.pull_request.base.ref }}" == "main" ]; then
-            echo "environment=prod" >> $GITHUB_ENV
-          else
-            echo "environment=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
-          fi
-     
-      # - name: Get GCP project
-      #   id: env-mapper
-      #   uses: ./.github/actions/env-to-gcp-mapper
-      #   with:
-      #     environment: ${{ env.environment }}
-      # Step 2: Authenticate to Google Cloud using Workload Identity Federation
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+          echo "environment=prod" >> $GITHUB_ENV
+
+      # Step 3: Authenticate to Google Cloud
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
         with:
           create_credentials_file: true
-          workload_identity_provider:  ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
- 
-       # Step 3: Authenticate with GitHub
+
+      # Step 4: Authenticate with GitHub
       - name: Authenticate with GitHub
         run: |
           git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com".insteadOf "https://github.com"
- 
-      # Step 4: Set up Terraform
+
+      # Step 5: Setup Terraform
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: '1.5.7'
- 
-      # Step to detect modified directories after the PR merge
-      - name: Detect modified directories in the current branch
-        id: detect_changes_in_apply
+
+      # Step 6: Detect modified directories
+      - name: Detect modified directories
+        id: detect_changes
         run: |
           CHANGED_DIRS=""
           OUTPUT_FILE="changed_directories.txt"
-          > $OUTPUT_FILE  # Clear the previous content of the file
- 
-          # Ensure we're on the current branch (after PR merge)
-          git fetch origin ${{ github.ref_name }}
-          git checkout ${{ github.ref_name }}
- 
-          # Get the list of modified files since the last commit on the current branch
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
- 
-          # Loop through each subdirectory under environments/{{Particular environment}}
+          > $OUTPUT_FILE
+
+          # Fetch main branch for accurate diff
+          git fetch origin main
+
+          # Compare current HEAD with latest main
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Detect first-level directories with .tfvars changes
           for dir in $(find environments/${{ env.environment }} -mindepth 1 -maxdepth 1 -type d); do
             if echo "$CHANGED_FILES" | grep -q "^$dir/.*\.tfvars$"; then
               echo "$dir" >> $OUTPUT_FILE
-              #echo "Modified directory: $dir"
               CHANGED_DIRS="$CHANGED_DIRS $dir"
             fi
           done
- 
+
           if [ ! -s $OUTPUT_FILE ]; then
-            echo "No modified .tfvars files found."
+            echo "No modified .tfvars files found. Exiting..."
             exit 0
           fi
- 
-          #echo "changed_dirs=$(cat $OUTPUT_FILE)" >> $GITHUB_ENV
+
+          echo "Changed directories:"
+          cat $OUTPUT_FILE
           echo "changed_dirs=$CHANGED_DIRS" >> $GITHUB_ENV
- 
-      # Step to Initialize and Plan Terraform for each changed directory
+
+      # Step 7: Terraform init & plan
       - name: Initialize and Plan Terraform
         run: |
           for dir in ${{ env.changed_dirs }}; do
             echo "Running terraform init and plan for $dir"
-            #Ensure we're back in the root directory before changing to the next directory
-            cd $GITHUB_WORKSPACE  # Go back to the root of the repository
-            #Change to the directory before running terraform commands
             cd $dir
             module_name=$(basename $dir | sed 's/^environments-${{ env.environment }}-//')
             terraform init -backend-config=../state.config -backend-config="prefix=${{ env.environment }}/terraform/${module_name}/terraform.tfstate"
             terraform plan
+            cd $GITHUB_WORKSPACE
           done
- 
-      # Step to Apply Terraform for each changed directory
-      - name: Apply Terraform for each changed directory
+
+      # Step 8: Terraform apply
+      - name: Apply Terraform
         run: |
           for dir in ${{ env.changed_dirs }}; do
             echo "Applying terraform for $dir"
-            #Ensure we're back in the root directory before changing to the next directory
-            cd $GITHUB_WORKSPACE  # Go back to the root of the repository
             cd $dir
             terraform apply -auto-approve
+            cd $GITHUB_WORKSPACE
           done
