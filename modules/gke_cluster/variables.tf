@@ -13,12 +13,12 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "network_self_link" {
+variable "network_name" {
   description = "The self link of the VPC network"
   type        = string
 }
 
-variable "subnet_self_link" {
+variable "subnet_name" {
   description = "The self link of the subnet"
   type        = string
 }

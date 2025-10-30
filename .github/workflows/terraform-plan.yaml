@@ -1,9 +1,9 @@
-name: Deploy Terraform on GCP (Dev/Test/Stage/Prod Environment)
+name: Deploy Terraform on GCP (PROD Environment)
  
 on:
   push:
     paths:
-      - 'envs/**/**/*.tfvars'  
+      - 'environments/**/**/*.tfvars'  
     branches:
       - main  # Trigger on push to the main branch
   pull_request:
@@ -11,7 +11,7 @@ on:
     branches:
       - main
     paths:
-      - 'envs/**/**/*.tfvars'  
+      - 'environments/**/**/*.tfvars'  
  
 jobs:
   plan:
@@ -53,10 +53,10 @@ jobs:
           workload_identity_provider:  ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
  
-      # # Step 3: Authenticate with GitHub
-      # - name: Authenticate with GitHub
-      #   run: |
-      #     git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com".insteadOf "https://github.com"
+       # Step 3: Authenticate with GitHub
+      - name: Authenticate with GitHub
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com".insteadOf "https://github.com"
  
       # Step 4: Set up Terraform
       - name: Set up Terraform

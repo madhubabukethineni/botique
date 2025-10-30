@@ -18,7 +18,7 @@ variable "ip_cidr_range" {
   type        = string
 }
 
-variable "network_self_link" {
+variable "network_name" {
   description = "The self link of the VPC network to which this subnetwork belongs."
   type        = string
 }

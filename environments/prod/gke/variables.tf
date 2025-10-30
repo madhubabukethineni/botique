@@ -68,3 +68,11 @@ variable "release_channel" {
   type        = string
   default     = ""
 }
+variable "network_name" {
+  description = "The self link of the VPC network"
+  type        = string
+}
+variable "subnet_name" {
+  description = "The self link of the subnet"
+  type        = string
+}

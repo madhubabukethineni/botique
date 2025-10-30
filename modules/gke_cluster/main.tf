@@ -3,8 +3,8 @@ resource "google_container_cluster" "primary" {
   project  = var.project_id
   location = var.region
 
-  network    = var.network_self_link
-  subnetwork = var.subnet_self_link
+  network    = var.network_name
+  subnetwork = var.subnet_name
 
   remove_default_node_pool = true
   initial_node_count       = 1
