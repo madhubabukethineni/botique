@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0  # Full history for git diff
+          fetch-depth: 0  # Fetch full history for git diff
 
       # Step 2: Set environment
       - name: Set Target Environment
@@ -56,12 +56,13 @@ jobs:
           OUTPUT_FILE="changed_directories.txt"
           > $OUTPUT_FILE
 
-          # Fetch main branch for accurate diff
+          # Ensure full commit history is available
+          git fetch --unshallow || true
           git fetch origin main
 
-          # Compare current HEAD with latest main
-          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
-          echo "Changed files:"
+          # Compare last commit (HEAD^) with current (HEAD)
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+          echo "🔍 Changed files:"
           echo "$CHANGED_FILES"
 
           # Detect first-level directories with .tfvars changes
@@ -73,7 +74,8 @@ jobs:
           done
 
           if [ ! -s $OUTPUT_FILE ]; then
-            echo "No modified .tfvars files found. Exiting..."
+            echo "✅ No modified .tfvars files found. Skipping Terraform apply."
+            echo "changed_dirs=" >> $GITHUB_ENV
             exit 0
           fi
 
@@ -83,9 +85,10 @@ jobs:
 
       # Step 7: Terraform init & plan
       - name: Initialize and Plan Terraform
+        if: env.changed_dirs != ''
         run: |
           for dir in ${{ env.changed_dirs }}; do
-            echo "Running terraform init and plan for $dir"
+            echo "🔧 Running terraform init and plan for $dir"
             cd $dir
             module_name=$(basename $dir | sed 's/^environments-${{ env.environment }}-//')
             terraform init -backend-config=../state.config -backend-config="prefix=${{ env.environment }}/terraform/${module_name}/terraform.tfstate"
@@ -95,9 +98,10 @@ jobs:
 
       # Step 8: Terraform apply
       - name: Apply Terraform
+        if: env.changed_dirs != ''
         run: |
           for dir in ${{ env.changed_dirs }}; do
-            echo "Applying terraform for $dir"
+            echo "🚀 Applying terraform for $dir"
             cd $dir
             terraform apply -auto-approve
             cd $GITHUB_WORKSPACE
