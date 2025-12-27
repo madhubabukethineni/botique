@@ -18,8 +18,8 @@ vpcs = {
     # --------------------
     # IPv6 (ULA)
     # --------------------
-    enable_ipv6_ula     = true
-    internal_ipv6_range = "fd20:1234:abcd::/48"
+    # enable_ipv6_ula     = true
+    # internal_ipv6_range = "fd20:1234:abcd::/48"
 
     # --------------------
     # Firewall / Profile
