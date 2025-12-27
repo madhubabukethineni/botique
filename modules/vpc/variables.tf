@@ -1,27 +1,78 @@
 variable "project_id" {
-  description = "The ID of the GCP project where the VPC network will be created."
   type        = string
+  description = "GCP project ID"
 }
 
-variable "name" {
-  description = "The name of the VPC network."
+variable "network_name" {
   type        = string
+  description = "Name of the VPC network"
+}
+
+variable "description" {
+  type        = string
+  default     = null
 }
 
 variable "auto_create_subnetworks" {
-  description = "When set to true, the network is created in auto mode with default subnets. Disable for custom subnet creation."
   type        = bool
   default     = false
 }
 
 variable "routing_mode" {
-  description = "The network-wide routing mode. Valid values are REGIONAL or GLOBAL."
   type        = string
-  default     = "REGIONAL"
+  default     = "GLOBAL"
+  validation {
+    condition     = contains(["GLOBAL", "REGIONAL"], var.routing_mode)
+    error_message = "routing_mode must be GLOBAL or REGIONAL"
+  }
 }
 
-variable "description" {
-  description = "Optional description for the network."
+variable "delete_default_internet_gateway_routes" {
+  type        = bool
+  default     = false
+}
+
+variable "mtu" {
+  type        = number
+  default     = 1460
+}
+
+variable "enable_ipv6_ula" {
+  type        = bool
+  default     = false
+}
+
+variable "internal_ipv6_range" {
   type        = string
-  default     = ""
+  default     = null
+}
+
+variable "network_firewall_policy_enforcement_order" {
+  type        = string
+  default     = null
+  description = "Controls firewall policy evaluation order"
+}
+
+variable "network_profile" {
+  type        = string
+  default     = null
+}
+
+variable "bgp_best_path_selection_mode" {
+  type        = string
+  default     = "LEGACY"
+  validation {
+    condition     = contains(["LEGACY", "STANDARD"], var.bgp_best_path_selection_mode)
+    error_message = "bgp_best_path_selection_mode must be LEGACY or STANDARD"
+  }
+}
+
+variable "bgp_always_compare_med" {
+  type        = bool
+  default     = false
+}
+
+variable "bgp_inter_region_cost" {
+  type        = bool
+  default     = false
 }
