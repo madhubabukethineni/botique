@@ -8,9 +8,14 @@ variable "subnetworks" {
     region                   = string
 
     description               = optional(string)
-    enable_flow_logs          = optional(bool)
     private_ip_google_access  = optional(bool)
     project_id                = optional(string)
+    log_config                = optional(object({
+      aggregation_interval = optional(string)
+      flow_sampling        = optional(number)
+      metadata             = optional(string)
+      metadata_fields      = optional(list(string))
+    }))
     secondary_ip_ranges       = optional(list(object({
       range_name    = string
       ip_cidr_range = string

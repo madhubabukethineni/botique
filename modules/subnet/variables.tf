@@ -30,16 +30,22 @@ variable "description" {
   default     = null
 }
 
-variable "enable_flow_logs" {
-  type        = bool
-  description = "Whether to enable VPC Flow Logs for this subnetwork"
-  default     = false
-}
 
 variable "private_ip_google_access" {
   type        = bool
   description = "Whether VMs without external IPs can reach Google APIs privately"
   default     = false
+}
+
+variable "log_config" {
+  description = "VPC Flow Logs configuration for the subnetwork"
+  type = object({
+    aggregation_interval = optional(string, "INTERVAL_5_SEC")
+    flow_sampling        = optional(number, 0.5)
+    metadata             = optional(string, "INCLUDE_ALL_METADATA")
+    metadata_fields      = optional(list(string))
+  })
+  default = null
 }
 
 variable "secondary_ip_ranges" {

@@ -5,9 +5,18 @@ resource "google_compute_subnetwork" "subnet" {
   region        = var.region
 
   description               = var.description
-  enable_flow_logs          = var.enable_flow_logs
   private_ip_google_access  = var.private_ip_google_access
   project                   = var.project_id
+
+  dynamic "log_config" {
+    for_each = var.log_config == null ? [] : [var.log_config]
+    content {
+      aggregation_interval = log_config.value.aggregation_interval
+      flow_sampling        = log_config.value.flow_sampling
+      metadata             = log_config.value.metadata
+      metadata_fields      = log_config.value.metadata_fields
+    }
+  }
 
   dynamic "secondary_ip_range" {
     for_each = var.secondary_ip_ranges
