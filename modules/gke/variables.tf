@@ -55,15 +55,13 @@ variable "private_cluster_config" {
 }
 
 variable "master_authorized_networks" {
-  type        = list(object({ cidr_block = string, display_name = string }))
-  description = "CIDR blocks allowed to access the master endpoint"
-  default     = []
+  type    = list(any)
+  default = []
 }
 
-variable "workload_identity" { 
-  type        = bool
-  description = "Enable workload identity"
-  default     = true
+variable "workload_identity" {
+  type    = bool
+  default = false
 }
 
 variable "addons_config" {

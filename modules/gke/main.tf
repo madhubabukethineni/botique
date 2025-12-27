@@ -36,8 +36,9 @@ resource "google_container_cluster" "this" {
   }
 
   # Master authorized networks
+  # FIX: Added coalesce() to handle null values by falling back to an empty list
   dynamic "master_authorized_networks_config" {
-    for_each = length(var.master_authorized_networks) > 0 ? [1] : []
+    for_each = length(coalesce(var.master_authorized_networks, [])) > 0 ? [1] : []
     content {
       dynamic "cidr_blocks" {
         for_each = var.master_authorized_networks
@@ -63,8 +64,9 @@ resource "google_container_cluster" "this" {
   }
 
   # Network policy (only if NOT Autopilot)
+  # FIX: Wrapped var.enable_autopilot in try() to ensure it defaults to false if null
   dynamic "network_policy" {
-    for_each = (!var.enable_autopilot && var.network_policy_config != null) ? [var.network_policy_config] : []
+    for_each = (!try(var.enable_autopilot, false) && var.network_policy_config != null) ? [var.network_policy_config] : []
     content {
       enabled  = network_policy.value.enabled
       provider = network_policy.value.provider
@@ -82,13 +84,14 @@ resource "google_container_cluster" "this" {
   }
 
   # Workload identity
+  # FIX: Added explicit check 'var.workload_identity == true' to handle null cases safely
   workload_identity_config {
-    workload_pool = var.workload_identity ? "${var.project_id}.svc.id.goog" : null
+    workload_pool = var.workload_identity == true ? "${var.project_id}.svc.id.goog" : null
   }
 
   # Node pools (only for Standard clusters)
   dynamic "node_pool" {
-    for_each = var.enable_autopilot ? {} : var.node_pools
+    for_each = try(var.enable_autopilot, false) ? {} : coalesce(var.node_pools, {})
     content {
       name               = node_pool.value.name
       initial_node_count = node_pool.value.min_count
