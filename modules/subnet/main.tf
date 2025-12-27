@@ -1,10 +1,13 @@
-resource "google_compute_subnetwork" "this" {
-  name                     = var.name
-  project                  = var.project_id
-  region                   = var.region
-  network                  = var.network_name
-  ip_cidr_range            = var.ip_cidr_range
-  private_ip_google_access = var.private_ip_google_access
+resource "google_compute_subnetwork" "subnet" {
+  name          = var.name
+  ip_cidr_range = var.ip_cidr_range
+  network       = var.network_name
+  region        = var.region
+
+  description               = var.description
+  enable_flow_logs          = var.enable_flow_logs
+  private_ip_google_access  = var.private_ip_google_access
+  project                   = var.project_id
 
   dynamic "secondary_ip_range" {
     for_each = var.secondary_ip_ranges

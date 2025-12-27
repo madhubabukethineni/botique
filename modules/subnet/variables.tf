@@ -8,7 +8,7 @@ variable "ip_cidr_range" {
   description = "Primary CIDR range for the subnetwork"
 }
 
-variable "network" {
+variable "network_name" {
   type        = string
   description = "VPC network resource link or name"
 }
@@ -18,7 +18,7 @@ variable "region" {
   description = "Region where the subnetwork will be created"
 }
 
-variable "project" {
+variable "project_id" {
   type        = string
   description = "Project ID where the subnetwork will be created"
   default     = null
