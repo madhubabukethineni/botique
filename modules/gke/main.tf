@@ -1,38 +1,30 @@
 resource "google_container_cluster" "this" {
   name     = var.name
-  project  = var.project_id
   location = var.location
+  project  = var.project_id
 
   network    = var.network
   subnetwork = var.subnetwork
 
-  # -----------------------------
-  # Autopilot block
-  # -----------------------------
-  dynamic "autopilot" {
-    for_each = var.enable_autopilot ? [1] : []
+  enable_autopilot = var.enable_autopilot
+
+  dynamic "release_channel" {
+    for_each = var.release_channel != null ? [1] : []
     content {
-      enabled = true
+      channel = var.release_channel
     }
   }
 
-  # -----------------------------
-  # IP Allocation
-  # -----------------------------
   dynamic "ip_allocation_policy" {
-    for_each = var.ip_allocation_policy == null ? [] : [var.ip_allocation_policy]
+    for_each = var.ip_allocation_policy != null ? [var.ip_allocation_policy] : []
     content {
       cluster_secondary_range_name  = ip_allocation_policy.value.cluster_secondary_range_name
       services_secondary_range_name = ip_allocation_policy.value.services_secondary_range_name
-      use_ip_aliases                = ip_allocation_policy.value.use_ip_aliases
     }
   }
 
-  # -----------------------------
-  # Private cluster config
-  # -----------------------------
   dynamic "private_cluster_config" {
-    for_each = var.private_cluster_config == null ? [] : [var.private_cluster_config]
+    for_each = var.private_cluster_config != null ? [var.private_cluster_config] : []
     content {
       enable_private_nodes    = private_cluster_config.value.enable_private_nodes
       enable_private_endpoint = private_cluster_config.value.enable_private_endpoint
@@ -40,14 +32,11 @@ resource "google_container_cluster" "this" {
     }
   }
 
-  # -----------------------------
-  # Master authorized networks
-  # -----------------------------
   dynamic "master_authorized_networks_config" {
-    for_each = var.master_authorized_networks == null ? [] : [var.master_authorized_networks]
+    for_each = length(var.master_authorized_networks) > 0 ? [1] : []
     content {
       dynamic "cidr_blocks" {
-        for_each = master_authorized_networks.value
+        for_each = var.master_authorized_networks
         content {
           cidr_block   = cidr_blocks.value.cidr_block
           display_name = cidr_blocks.value.display_name
@@ -56,41 +45,8 @@ resource "google_container_cluster" "this" {
     }
   }
 
-  # -----------------------------
-  # Workload identity
-  # -----------------------------
-  dynamic "workload_identity_config" {
-    for_each = var.workload_identity ? [1] : []
-    content {
-      workload_pool = "${var.project_id}.svc.id.goog"
-    }
-  }
-
-  # -----------------------------
-  # Logging
-  # -----------------------------
-  dynamic "logging_config" {
-    for_each = var.logging_components == null ? [] : [1]
-    content {
-      enable_components = var.logging_components
-    }
-  }
-
-  # -----------------------------
-  # Monitoring
-  # -----------------------------
-  dynamic "monitoring_config" {
-    for_each = var.monitoring_components == null ? [] : [1]
-    content {
-      enable_components = var.monitoring_components
-    }
-  }
-
-  # -----------------------------
-  # Addons
-  # -----------------------------
   dynamic "addons_config" {
-    for_each = var.addons_config == null ? [] : [var.addons_config]
+    for_each = var.addons_config != null ? [var.addons_config] : []
     content {
       http_load_balancing {
         disabled = !addons_config.value.http_load_balancing
@@ -98,11 +54,43 @@ resource "google_container_cluster" "this" {
       horizontal_pod_autoscaling {
         disabled = !addons_config.value.horizontal_pod_autoscaling
       }
-      kubernetes_dashboard {
-        disabled = !addons_config.value.kubernetes_dashboard
+    }
+  }
+
+  dynamic "network_policy" {
+    for_each = var.network_policy_config != null ? [var.network_policy_config] : []
+    content {
+      enabled  = network_policy.value.enabled
+      provider = network_policy.value.provider
+    }
+  }
+
+  logging_config {
+    enable_components = var.logging_components
+  }
+
+  monitoring_config {
+    enable_components = var.monitoring_components
+  }
+
+  workload_identity_config {
+    workload_pool = var.workload_identity ? "${var.project_id}.svc.id.goog" : null
+  }
+
+  # Node pools
+  dynamic "node_pool" {
+    for_each = var.node_pools
+    content {
+      name       = node_pool.value.name
+      initial_node_count = node_pool.value.min_count
+      autoscaling {
+        min_node_count = node_pool.value.min_count
+        max_node_count = node_pool.value.max_count
       }
-      network_policy_config {
-        disabled = !addons_config.value.network_policy_config
+      node_config {
+        machine_type = node_pool.value.machine_type
+        disk_size_gb = node_pool.value.disk_size_gb
+        preemptible  = lookup(node_pool.value, "preemptible", false)
       }
     }
   }

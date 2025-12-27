@@ -1,122 +1,110 @@
 variable "name" {
-  description = "GKE cluster name"
   type        = string
+  description = "Name of the GKE cluster"
 }
 
 variable "project_id" {
-  description = "GCP project ID"
   type        = string
+  description = "GCP project ID where the cluster will be created"
 }
 
 variable "location" {
-  description = "Cluster region or zone"
   type        = string
+  description = "Region or zone for the cluster"
 }
 
 variable "network" {
-  description = "VPC network ID or self_link"
   type        = string
+  description = "VPC network name or self_link where cluster will be deployed"
 }
 
 variable "subnetwork" {
-  description = "Subnetwork ID or self_link"
   type        = string
+  description = "Subnetwork name or self_link where cluster nodes will be deployed"
 }
 
-# -------------------------
-# Autopilot vs Standard
-# -------------------------
 variable "enable_autopilot" {
-  type        = optional(bool)
-  description = "Enable Autopilot mode for this cluster"
+  type        = bool
+  description = "Whether to enable Autopilot mode for the cluster"
   default     = false
 }
 
-# -------------------------
-# Standard cluster configs
-# -------------------------
 variable "release_channel" {
-  type        = optional(string)
-  description = "Release channel for cluster"
+  type        = string
+  description = "Release channel for the cluster (e.g., REGULAR, RAPID, STABLE)"
   default     = null
 }
 
 variable "ip_allocation_policy" {
-  description = "IP allocation policy for VPC-native clusters"
-  type = optional(object({
-    cluster_secondary_range_name  = optional(string)
-    services_secondary_range_name = optional(string)
-    use_ip_aliases                = optional(bool)
-  }))
-  default = null
+  type = object({
+    cluster_secondary_range_name  = string
+    services_secondary_range_name = string
+  })
+  description = "IP allocation policy defining secondary ranges for pods and services"
+  default     = null
 }
 
 variable "private_cluster_config" {
-  type = optional(object({
-    enable_private_nodes    = optional(bool)
-    enable_private_endpoint = optional(bool)
-    master_ipv4_cidr_block  = optional(string)
-  }))
-  description = "Config for private GKE clusters"
+  type = object({
+    enable_private_nodes    = bool
+    enable_private_endpoint = bool
+    master_ipv4_cidr_block  = string
+  })
+  description = "Private cluster configuration including master CIDR and private nodes"
   default     = null
 }
 
 variable "master_authorized_networks" {
-  description = "Master authorized networks"
-  type = optional(list(object({
-    cidr_block   = string
-    display_name = string
-  })))
-  default = null
+  type        = list(object({ cidr_block = string, display_name = string }))
+  description = "List of CIDR blocks allowed to access the master endpoint"
+  default     = []
 }
 
 variable "workload_identity" {
-  type        = optional(bool)
-  description = "Enable workload identity"
-  default     = false
+  type        = bool
+  description = "Whether to enable workload identity for the cluster"
+  default     = true
 }
 
 variable "addons_config" {
-  description = "Additional GKE addons"
-  type = optional(object({
-    http_load_balancing          = optional(bool)
-    horizontal_pod_autoscaling   = optional(bool)
-    kubernetes_dashboard         = optional(bool)
-    network_policy_config        = optional(bool)
-  }))
-  default = null
+  type = object({
+    http_load_balancing        = bool
+    horizontal_pod_autoscaling = bool
+  })
+  description = "Addons configuration for the cluster"
+  default     = null
 }
 
 variable "network_policy_config" {
-  description = "Network policy config block"
-  type = optional(object({
-    disabled = optional(bool)
-  }))
-  default = null
+  type = object({
+    enabled  = bool
+    provider = string
+  })
+  description = "Network policy configuration (e.g., CALICO provider)"
+  default     = null
 }
 
 variable "logging_components" {
-  description = "Enable logging components"
-  type        = optional(list(string))
-  default     = null
+  type        = list(string)
+  description = "Logging components to enable in the cluster"
+  default     = ["SYSTEM_COMPONENTS"]
 }
 
 variable "monitoring_components" {
-  description = "Enable monitoring components"
-  type        = optional(list(string))
-  default     = null
+  type        = list(string)
+  description = "Monitoring components to enable in the cluster"
+  default     = ["SYSTEM_COMPONENTS"]
 }
 
 variable "node_pools" {
-  description = "Node pool definitions (standard clusters only)"
-  type = optional(map(object({
-    machine_type = optional(string)
-    disk_size_gb = optional(number)
-    min_count    = optional(number)
-    max_count    = optional(number)
-    auto_upgrade = optional(bool)
-    auto_repair  = optional(bool)
-    preemptible  = optional(bool)
-  })))
-  default = {}
+  type = map(object({
+    name         = string
+    machine_type = string
+    min_count    = number
+    max_count    = number
+    disk_size_gb = number
+    preemptible  = optional(bool, false)
+  }))
+  description = "Map of node pools to create for the cluster"
+  default     = {}
 }
