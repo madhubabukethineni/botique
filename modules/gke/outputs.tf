@@ -7,8 +7,7 @@ output "endpoint" {
 }
 
 output "private_endpoint" {
-  value = google_container_cluster.this.private_cluster_config[0].private_endpoint
-  condition = length(google_container_cluster.this.private_cluster_config) > 0
+  value = try(google_container_cluster.this.private_cluster_config[0].private_endpoint, null)
 }
 
 output "self_link" {
