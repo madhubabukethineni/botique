@@ -6,7 +6,8 @@ gke_clusters = {
     subnetwork       = "prod-subnet-1"
     enable_autopilot = true
     release_channel  = "REGULAR"
-
+    node_pools = {}
+    network_policy_config = {}
     ip_allocation_policy = {
       cluster_secondary_range_name  = "pods"
       services_secondary_range_name = "services"
