@@ -30,5 +30,6 @@ subnetworks = {
     network_name = "nonprod-vpc"
     region        = "europe-west1"
     project_id    = "k8s-prep-433307"
+    secondary_ip_ranges = []
   }
 }
