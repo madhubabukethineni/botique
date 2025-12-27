@@ -3,7 +3,7 @@ terraform {
 }
 
 module "vpc" {
-  source   = "./modules/vpc"
+  source   = "../../../modules/vpc"
   for_each = local.vpcs_expanded
 
   project_id   = each.value.project_id
