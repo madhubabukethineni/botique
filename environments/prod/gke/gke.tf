@@ -1,5 +1,5 @@
 module "gke" {
-  source   = "../../modules/gke"
+  source   = "../../../modules/gke"
   for_each = var.gke_clusters
 
   name                   = each.key
