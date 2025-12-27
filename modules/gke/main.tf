@@ -88,7 +88,7 @@ resource "google_container_cluster" "this" {
 
   # Node pools (only if NOT Autopilot)
   dynamic "node_pool" {
-    for_each = var.enable_autopilot ? [] : var.node_pools
+    for_each = var.enable_autopilot ? {} : var.node_pools
     content {
       name               = node_pool.value.name
       initial_node_count = node_pool.value.min_count
