@@ -64,7 +64,7 @@ resource "google_container_cluster" "this" {
 
   # Network policy (only if NOT Autopilot)
   dynamic "network_policy" {
-    for_each = (var.network_policy_config != null && !var.enable_autopilot) ? [var.network_policy_config] : []
+    for_each = (!var.enable_autopilot && var.network_policy_config != null) ? [var.network_policy_config] : []
     content {
       enabled  = network_policy.value.enabled
       provider = network_policy.value.provider
@@ -86,7 +86,7 @@ resource "google_container_cluster" "this" {
     workload_pool = var.workload_identity ? "${var.project_id}.svc.id.goog" : null
   }
 
-  # Node pools (only if NOT Autopilot)
+  # Node pools (only for Standard clusters)
   dynamic "node_pool" {
     for_each = var.enable_autopilot ? {} : var.node_pools
     content {

@@ -1,37 +1,37 @@
-variable "name" {
+variable "name" { 
   type        = string
-  description = "Name of the GKE cluster (lowercase letters, numbers, and hyphens only)"
+  description = "Name of the GKE cluster (lowercase, hyphens only)"
 }
 
-variable "project_id" {
+variable "project_id" { 
   type        = string
-  description = "GCP project ID where the cluster will be created"
+  description = "GCP project ID"
 }
 
-variable "location" {
+variable "location" { 
   type        = string
-  description = "Region or zone for the GKE cluster"
+  description = "Region or zone for the cluster"
 }
 
-variable "network" {
+variable "network" { 
   type        = string
-  description = "VPC network name where the cluster will be deployed"
+  description = "VPC network name or self_link"
 }
 
-variable "subnetwork" {
+variable "subnetwork" { 
   type        = string
-  description = "Subnet name where the cluster will be deployed"
+  description = "Subnetwork name or self_link"
 }
 
-variable "enable_autopilot" {
+variable "enable_autopilot" { 
   type        = bool
-  description = "Enable Autopilot mode for this cluster"
+  description = "Enable Autopilot mode for the cluster"
   default     = false
 }
 
-variable "release_channel" {
+variable "release_channel" { 
   type        = string
-  description = "Release channel for the cluster (STABLE, REGULAR, RAPID)"
+  description = "GKE release channel (REGULAR, RAPID, STABLE)"
   default     = null
 }
 
@@ -40,7 +40,7 @@ variable "ip_allocation_policy" {
     cluster_secondary_range_name  = string
     services_secondary_range_name = string
   })
-  description = "IP allocation policy for secondary ranges"
+  description = "IP allocation policy for VPC-native clusters"
   default     = null
 }
 
@@ -56,11 +56,11 @@ variable "private_cluster_config" {
 
 variable "master_authorized_networks" {
   type        = list(object({ cidr_block = string, display_name = string }))
-  description = "List of CIDR blocks allowed to access master"
+  description = "CIDR blocks allowed to access the master endpoint"
   default     = []
 }
 
-variable "workload_identity" {
+variable "workload_identity" { 
   type        = bool
   description = "Enable workload identity"
   default     = true
@@ -71,8 +71,8 @@ variable "addons_config" {
     http_load_balancing        = bool
     horizontal_pod_autoscaling = bool
   })
-  description = "Addons configuration for GKE cluster"
-  default     = null
+  description = "GKE addons configuration"
+  default = null
 }
 
 variable "network_policy_config" {
@@ -80,19 +80,19 @@ variable "network_policy_config" {
     enabled  = bool
     provider = string
   })
-  description = "Network policy configuration"
-  default     = null
+  description = "Network policy configuration (only for Standard clusters)"
+  default = null
 }
 
-variable "logging_components" {
+variable "logging_components" { 
   type        = list(string)
-  description = "GKE cluster logging components"
+  description = "Logging components to enable"
   default     = ["SYSTEM_COMPONENTS"]
 }
 
-variable "monitoring_components" {
+variable "monitoring_components" { 
   type        = list(string)
-  description = "GKE cluster monitoring components"
+  description = "Monitoring components to enable"
   default     = ["SYSTEM_COMPONENTS"]
 }
 
@@ -104,7 +104,9 @@ variable "node_pools" {
     max_count    = number
     disk_size_gb = number
     preemptible  = optional(bool, false)
+    auto_upgrade = optional(bool, false)
+    auto_repair  = optional(bool, false)
   }))
-  description = "Node pool configuration (ignored if Autopilot is enabled)"
-  default     = {}
+  description = "Node pools for Standard clusters (ignored in Autopilot)"
+  default = {}
 }
