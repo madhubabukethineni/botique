@@ -32,14 +32,14 @@ module "gke" {
   source   = "../../../modules/gke"
   for_each = var.gke_clusters
 
-  name               = each.key
-  project_id         = each.value.project_id
-  location           = each.value.location
-  network            = each.value.network
-  subnetwork         = each.value.subnetwork
-  enable_autopilot   = each.value.enable_autopilot
+  name             = each.key
+  project_id       = each.value.project_id
+  location         = each.value.location
+  network          = each.value.network
+  subnetwork       = each.value.subnetwork
+  enable_autopilot = each.value.enable_autopilot
 
-  # Use try() to handle keys that might be missing in some objects but present in others
+  # Safely handle optional fields from the 'any' map
   release_channel            = try(each.value.release_channel, null)
   ip_allocation_policy       = try(each.value.ip_allocation_policy, null)
   private_cluster_config     = try(each.value.private_cluster_config, null)

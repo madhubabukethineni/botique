@@ -1,26 +1,9 @@
-variable "name" {
-  type = string
-}
-
-variable "location" {
-  type = string
-}
-
-variable "project_id" {
-  type = string
-}
-
-variable "network" {
-  type = string
-}
-
-variable "subnetwork" {
-  type = string
-}
-
-variable "enable_autopilot" {
-  type = bool
-}
+variable "name" { type = string }
+variable "location" { type = string }
+variable "project_id" { type = string }
+variable "network" { type = string }
+variable "subnetwork" { type = string }
+variable "enable_autopilot" { type = bool }
 
 variable "release_channel" {
   type    = string

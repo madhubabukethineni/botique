@@ -57,7 +57,7 @@ resource "google_container_cluster" "this" {
     }
   }
 
-  # Strictly omitted for Autopilot to avoid provider conflicts
+  # FIX: Block MUST be omitted for Autopilot clusters
   dynamic "network_policy" {
     for_each = (var.enable_autopilot == false && var.network_policy_config != null) ? [1] : []
     content {
@@ -78,7 +78,7 @@ resource "google_container_cluster" "this" {
     workload_pool = var.workload_identity == true ? "${var.project_id}.svc.id.goog" : null
   }
 
-  # Strictly omitted for Autopilot to avoid provider conflicts
+  # FIX: Block MUST be omitted for Autopilot clusters
   dynamic "node_pool" {
     for_each = var.enable_autopilot ? {} : coalesce(var.node_pools, {})
     content {
