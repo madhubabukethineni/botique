@@ -38,7 +38,7 @@ gke_clusters = {
     network    = "nonprod-vpc"
     subnetwork = "nonprod-subnet"
 
-    enable_autopilot = false
+    # enable_autopilot = false
     description      = "Non-Prod Standard Cluster"
 
     node_pools = {
