@@ -1,3 +1,7 @@
+terraform {
+  backend "gcs" {}
+}
+
 module "subnets" {
   source   = "../../../modules/subnetwork"
   for_each = var.subnetworks
