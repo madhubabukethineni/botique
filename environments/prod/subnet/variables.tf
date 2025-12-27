@@ -4,13 +4,13 @@ variable "subnetworks" {
   type = map(object({
     name                     = string
     ip_cidr_range            = string
-    network                  = string
+    network_name             = string
     region                   = string
 
     description               = optional(string)
     enable_flow_logs          = optional(bool)
     private_ip_google_access  = optional(bool)
-    project                   = optional(string)
+    project_id                = optional(string)
     secondary_ip_ranges       = optional(list(object({
       range_name    = string
       ip_cidr_range = string
