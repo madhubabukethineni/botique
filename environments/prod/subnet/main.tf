@@ -3,7 +3,7 @@ terraform {
 }
 
 module "subnets" {
-  source   = "../../../modules/subnetwork"
+  source   = "../../../modules/subnet"
   for_each = var.subnetworks
 
   name                     = each.value.name
