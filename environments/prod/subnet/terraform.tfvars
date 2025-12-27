@@ -9,8 +9,13 @@ subnetworks = {
     private_ip_google_access = true
 
     secondary_ip_ranges = [
-      { range_name = "pods"; ip_cidr_range = "192.168.64.0/22" },
-      { range_name = "services"; ip_cidr_range = "192.168.0.0/24" }
+      { range_name = "pods"
+       ip_cidr_range = "192.168.64.0/22"
+      },
+      
+      { range_name = "services"
+       ip_cidr_range = "192.168.0.0/24" 
+      }
     ]
   }
 
