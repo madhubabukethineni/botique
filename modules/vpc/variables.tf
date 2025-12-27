@@ -73,6 +73,7 @@ variable "bgp_always_compare_med" {
 }
 
 variable "bgp_inter_region_cost" {
-  type        = bool
-  default     = false
+  type        = string
+  default     = "DEFAULT"
+  description = "Inter-region cost behavior for BGP"
 }

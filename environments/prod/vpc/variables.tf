@@ -33,7 +33,8 @@ variable "vpcs" {
     # --------------------
     bgp_best_path_selection_mode = optional(string, "LEGACY")
     bgp_always_compare_med       = optional(bool, false)
-    bgp_inter_region_cost        = optional(bool, false)
+    bgp_inter_region_cost        = optional(string, "DEFAULT")
+
 
   }))
 }

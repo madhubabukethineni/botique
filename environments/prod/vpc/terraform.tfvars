@@ -32,7 +32,7 @@ vpcs = {
     # --------------------
     bgp_best_path_selection_mode = "STANDARD"
     bgp_always_compare_med       = true
-    bgp_inter_region_cost        = true
+    bgp_inter_region_cost        = "ADD_COST_TO_MED"
   },
 
   # --------------------
