@@ -29,5 +29,6 @@ subnetworks = {
     ip_cidr_range = "10.20.1.0/24"
     network_name = "nonprod-vpc"
     region        = "europe-west1"
+    project_id    = "k8s-prep-433307"
   }
 }
