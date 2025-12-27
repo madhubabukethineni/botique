@@ -8,6 +8,7 @@ resource "google_container_cluster" "this" {
 
   enable_autopilot = var.enable_autopilot
 
+  # Release channel
   dynamic "release_channel" {
     for_each = var.release_channel != null ? [1] : []
     content {
@@ -15,6 +16,7 @@ resource "google_container_cluster" "this" {
     }
   }
 
+  # IP allocation policy
   dynamic "ip_allocation_policy" {
     for_each = var.ip_allocation_policy != null ? [var.ip_allocation_policy] : []
     content {
@@ -23,6 +25,7 @@ resource "google_container_cluster" "this" {
     }
   }
 
+  # Private cluster
   dynamic "private_cluster_config" {
     for_each = var.private_cluster_config != null ? [var.private_cluster_config] : []
     content {
@@ -32,6 +35,7 @@ resource "google_container_cluster" "this" {
     }
   }
 
+  # Master authorized networks
   dynamic "master_authorized_networks_config" {
     for_each = length(var.master_authorized_networks) > 0 ? [1] : []
     content {
@@ -45,6 +49,7 @@ resource "google_container_cluster" "this" {
     }
   }
 
+  # Addons
   dynamic "addons_config" {
     for_each = var.addons_config != null ? [var.addons_config] : []
     content {
@@ -57,31 +62,35 @@ resource "google_container_cluster" "this" {
     }
   }
 
+  # Network policy (only if NOT Autopilot)
   dynamic "network_policy" {
-    for_each = var.network_policy_config != null ? [var.network_policy_config] : []
+    for_each = (var.network_policy_config != null && !var.enable_autopilot) ? [var.network_policy_config] : []
     content {
       enabled  = network_policy.value.enabled
       provider = network_policy.value.provider
     }
   }
 
+  # Logging
   logging_config {
     enable_components = var.logging_components
   }
 
+  # Monitoring
   monitoring_config {
     enable_components = var.monitoring_components
   }
 
+  # Workload identity
   workload_identity_config {
     workload_pool = var.workload_identity ? "${var.project_id}.svc.id.goog" : null
   }
 
-  # Node pools
+  # Node pools (only if NOT Autopilot)
   dynamic "node_pool" {
-    for_each = var.node_pools
+    for_each = var.enable_autopilot ? [] : var.node_pools
     content {
-      name       = node_pool.value.name
+      name               = node_pool.value.name
       initial_node_count = node_pool.value.min_count
       autoscaling {
         min_node_count = node_pool.value.min_count

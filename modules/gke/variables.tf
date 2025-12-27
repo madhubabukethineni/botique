@@ -1,6 +1,6 @@
 variable "name" {
   type        = string
-  description = "Name of the GKE cluster"
+  description = "Name of the GKE cluster (lowercase letters, numbers, and hyphens only)"
 }
 
 variable "project_id" {
@@ -10,28 +10,28 @@ variable "project_id" {
 
 variable "location" {
   type        = string
-  description = "Region or zone for the cluster"
+  description = "Region or zone for the GKE cluster"
 }
 
 variable "network" {
   type        = string
-  description = "VPC network name or self_link where cluster will be deployed"
+  description = "VPC network name where the cluster will be deployed"
 }
 
 variable "subnetwork" {
   type        = string
-  description = "Subnetwork name or self_link where cluster nodes will be deployed"
+  description = "Subnet name where the cluster will be deployed"
 }
 
 variable "enable_autopilot" {
   type        = bool
-  description = "Whether to enable Autopilot mode for the cluster"
+  description = "Enable Autopilot mode for this cluster"
   default     = false
 }
 
 variable "release_channel" {
   type        = string
-  description = "Release channel for the cluster (e.g., REGULAR, RAPID, STABLE)"
+  description = "Release channel for the cluster (STABLE, REGULAR, RAPID)"
   default     = null
 }
 
@@ -40,7 +40,7 @@ variable "ip_allocation_policy" {
     cluster_secondary_range_name  = string
     services_secondary_range_name = string
   })
-  description = "IP allocation policy defining secondary ranges for pods and services"
+  description = "IP allocation policy for secondary ranges"
   default     = null
 }
 
@@ -50,19 +50,19 @@ variable "private_cluster_config" {
     enable_private_endpoint = bool
     master_ipv4_cidr_block  = string
   })
-  description = "Private cluster configuration including master CIDR and private nodes"
+  description = "Private cluster configuration"
   default     = null
 }
 
 variable "master_authorized_networks" {
   type        = list(object({ cidr_block = string, display_name = string }))
-  description = "List of CIDR blocks allowed to access the master endpoint"
+  description = "List of CIDR blocks allowed to access master"
   default     = []
 }
 
 variable "workload_identity" {
   type        = bool
-  description = "Whether to enable workload identity for the cluster"
+  description = "Enable workload identity"
   default     = true
 }
 
@@ -71,7 +71,7 @@ variable "addons_config" {
     http_load_balancing        = bool
     horizontal_pod_autoscaling = bool
   })
-  description = "Addons configuration for the cluster"
+  description = "Addons configuration for GKE cluster"
   default     = null
 }
 
@@ -80,19 +80,19 @@ variable "network_policy_config" {
     enabled  = bool
     provider = string
   })
-  description = "Network policy configuration (e.g., CALICO provider)"
+  description = "Network policy configuration"
   default     = null
 }
 
 variable "logging_components" {
   type        = list(string)
-  description = "Logging components to enable in the cluster"
+  description = "GKE cluster logging components"
   default     = ["SYSTEM_COMPONENTS"]
 }
 
 variable "monitoring_components" {
   type        = list(string)
-  description = "Monitoring components to enable in the cluster"
+  description = "GKE cluster monitoring components"
   default     = ["SYSTEM_COMPONENTS"]
 }
 
@@ -105,6 +105,6 @@ variable "node_pools" {
     disk_size_gb = number
     preemptible  = optional(bool, false)
   }))
-  description = "Map of node pools to create for the cluster"
+  description = "Node pool configuration (ignored if Autopilot is enabled)"
   default     = {}
 }

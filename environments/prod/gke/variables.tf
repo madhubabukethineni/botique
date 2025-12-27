@@ -1,5 +1,5 @@
 variable "gke_clusters" {
-  description = "Map of GKE clusters to create. Each key represents a cluster name, and the value contains cluster properties."
+  description = "Map of GKE clusters to create. Each key represents a cluster name."
   type = map(object({
     project_id = string
     location   = string
