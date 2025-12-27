@@ -8,7 +8,6 @@ resource "google_container_cluster" "this" {
 
   enable_autopilot = var.enable_autopilot
 
-  # Release channel
   dynamic "release_channel" {
     for_each = var.release_channel != null ? [1] : []
     content {
@@ -16,7 +15,6 @@ resource "google_container_cluster" "this" {
     }
   }
 
-  # IP allocation policy
   dynamic "ip_allocation_policy" {
     for_each = var.ip_allocation_policy != null ? [var.ip_allocation_policy] : []
     content {
@@ -25,7 +23,6 @@ resource "google_container_cluster" "this" {
     }
   }
 
-  # Private cluster
   dynamic "private_cluster_config" {
     for_each = var.private_cluster_config != null ? [var.private_cluster_config] : []
     content {
@@ -35,7 +32,6 @@ resource "google_container_cluster" "this" {
     }
   }
 
-  # Master authorized networks (Safe for both types)
   dynamic "master_authorized_networks_config" {
     for_each = length(coalesce(var.master_authorized_networks, [])) > 0 ? [1] : []
     content {
@@ -49,7 +45,6 @@ resource "google_container_cluster" "this" {
     }
   }
 
-  # Addons
   dynamic "addons_config" {
     for_each = var.addons_config != null ? [var.addons_config] : []
     content {
@@ -62,7 +57,7 @@ resource "google_container_cluster" "this" {
     }
   }
 
-  # FIX: Omit for Autopilot
+  # Strictly omitted for Autopilot to avoid provider conflicts
   dynamic "network_policy" {
     for_each = (var.enable_autopilot == false && var.network_policy_config != null) ? [1] : []
     content {
@@ -83,7 +78,7 @@ resource "google_container_cluster" "this" {
     workload_pool = var.workload_identity == true ? "${var.project_id}.svc.id.goog" : null
   }
 
-  # FIX: Omit for Autopilot
+  # Strictly omitted for Autopilot to avoid provider conflicts
   dynamic "node_pool" {
     for_each = var.enable_autopilot ? {} : coalesce(var.node_pools, {})
     content {
@@ -96,7 +91,7 @@ resource "google_container_cluster" "this" {
       node_config {
         machine_type = node_pool.value.machine_type
         disk_size_gb = node_pool.value.disk_size_gb
-        preemptible  = lookup(node_pool.value, "preemptible", false)
+        preemptible  = try(node_pool.value.preemptible, false)
       }
     }
   }

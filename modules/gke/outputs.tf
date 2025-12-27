@@ -5,3 +5,7 @@ output "cluster_name" {
 output "endpoint" {
   value = google_container_cluster.this.endpoint
 }
+
+output "id" {
+  value = google_container_cluster.this.id
+}

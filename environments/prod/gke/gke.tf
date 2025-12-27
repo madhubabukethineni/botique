@@ -1,7 +1,3 @@
-terraform{
-    backend "gcs" {}
-}
-
 module "gke" {
   source   = "../../../modules/gke"
   for_each = var.gke_clusters

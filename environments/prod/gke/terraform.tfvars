@@ -17,6 +17,7 @@ gke_clusters = {
       enable_private_endpoint = true
       master_ipv4_cidr_block  = "172.16.0.0/28"
     }
+
     workload_identity = true
   }
 
@@ -36,9 +37,13 @@ gke_clusters = {
         disk_size_gb = 100
       }
     }
+
     network_policy_config = {
       enabled  = true
       provider = "CALICO"
     }
+
+    logging_components    = ["SYSTEM_COMPONENTS", "WORKLOADS"]
+    monitoring_components = ["SYSTEM_COMPONENTS"]
   }
 }
