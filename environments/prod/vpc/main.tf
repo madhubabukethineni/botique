@@ -4,7 +4,7 @@ terraform {
 
 module "vpc" {
   source   = "../../../modules/vpc"
-  for_each = local.vpcs_expanded
+  for_each = var.vpcs
 
   project_id   = each.value.project_id
   network_name = each.value.network_name
