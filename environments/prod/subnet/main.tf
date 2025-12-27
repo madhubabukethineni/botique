@@ -2,13 +2,17 @@ terraform {
   backend "gcs" {}
 }
 
-module "subnet" {
-  source = "../../../modules/subnet"
-  project_id = var.project_id
-  region     = var.region
-  name       = var.subnet_name
-  ip_cidr_range = var.ip_cidr_range
-  network_name = var.network_name
-  private_ip_google_access = var.private_ip_google_access
-  secondary_ip_ranges = var.secondary_ip_ranges
+module "subnets" {
+  source   = "../../../modules/subnet"
+  for_each = var.subnetworks
+
+  name                     = each.value.name
+  ip_cidr_range            = each.value.ip_cidr_range
+  network_name             = each.value.network_name
+  region                   = each.value.region
+  project_id               = each.value.project_id
+  description               = each.value.description
+  log_config               = each.value.log_config
+  private_ip_google_access = each.value.private_ip_google_access
+  secondary_ip_ranges      = each.value.secondary_ip_ranges
 }
