@@ -1,78 +1,50 @@
-# ==============================
-# GKE Cluster Module Variables
-# ==============================
+variable "gke_clusters" {
+  description = "Map of GKE clusters"
+  type = map(object({
+    project_id        = string
+    location          = string
+    network           = string
+    subnetwork        = string
 
-variable "project_id" {
-  description = "The GCP project ID where the cluster will be created"
-  type        = string
-}
+    enable_autopilot  = optional(bool)
+    release_channel   = optional(string)
 
-variable "region" {
-  description = "The region where the GKE cluster will be deployed"
-  type        = string
-}
+    ip_allocation_policy = optional(object({
+      cluster_secondary_range_name  = optional(string)
+      services_secondary_range_name = optional(string)
+      use_ip_aliases                = optional(bool)
+    }))
 
-variable "cluster_name" {
-  description = "The name of the GKE cluster"
-  type        = string
-}
+    private_cluster_config = optional(object({
+      enable_private_nodes    = optional(bool)
+      enable_private_endpoint = optional(bool)
+      master_ipv4_cidr_block  = optional(string)
+    }))
 
-variable "cluster_secondary_range" {
-  description = "The name of the secondary IP range for pods"
-  type        = string
-}
+    master_authorized_networks = optional(list(object({
+      cidr_block   = string
+      display_name = string
+    })))
 
-variable "services_secondary_range" {
-  description = "The name of the secondary IP range for services"
-  type        = string
-}
+    workload_identity     = optional(bool)
+    logging_components    = optional(list(string))
+    monitoring_components = optional(list(string))
 
-variable "master_ipv4_cidr_block" {
-  description = "The CIDR block for the GKE control plane"
-  type        = string
-  default     = null
-}
+    addons_config = optional(object({
+      http_load_balancing        = optional(bool)
+      horizontal_pod_autoscaling = optional(bool)
+      kubernetes_dashboard       = optional(bool)
+      network_policy_config      = optional(bool)
+    }))
 
-variable "enable_private_nodes" {
-  description = "Enable private nodes in the cluster"
-  type        = bool
-  default     = true
-}
-
-variable "enable_private_endpoint" {
-  description = "Enable private endpoint for the cluster"
-  type        = bool
-  default     = false
-}
-
-variable "workload_identity" {
-  description = "Enable Workload Identity for the cluster"
-  type        = bool
-  default     = true
-}
-
-variable "logging_service" {
-  description = "Logging service used by the cluster"
-  type        = string
-  default     = "logging.googleapis.com/kubernetes"
-}
-
-variable "monitoring_service" {
-  description = "Monitoring service used by the cluster"
-  type        = string
-  default     = "monitoring.googleapis.com/kubernetes"
-}
-
-variable "release_channel" {
-  description = "Release channel for GKE (e.g., RAPID, REGULAR, STABLE)"
-  type        = string
-  default     = ""
-}
-variable "network_name" {
-  description = "The self link of the VPC network"
-  type        = string
-}
-variable "subnet_name" {
-  description = "The self link of the subnet"
-  type        = string
+    node_pools = optional(map(object({
+      machine_type = optional(string)
+      disk_size_gb = optional(number)
+      min_count    = optional(number)
+      max_count    = optional(number)
+      auto_upgrade = optional(bool)
+      auto_repair  = optional(bool)
+      preemptible  = optional(bool)
+    })))
+  }))
 }
