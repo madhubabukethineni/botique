@@ -1,39 +1,52 @@
-variable "project_id" {
-  description = "The ID of the GCP project where the subnetwork will be created."
-  type        = string
-}
-
-variable "region" {
-  description = "The region where the subnetwork will be created."
-  type        = string
-}
-
 variable "name" {
-  description = "The name of the subnetwork."
   type        = string
+  description = "Name of the subnetwork"
 }
 
 variable "ip_cidr_range" {
-  description = "The primary IP CIDR range of the subnetwork."
   type        = string
+  description = "Primary CIDR range for the subnetwork"
 }
 
-variable "network_name" {
-  description = "The self link of the VPC network to which this subnetwork belongs."
+variable "network" {
   type        = string
+  description = "VPC network resource link or name"
+}
+
+variable "region" {
+  type        = string
+  description = "Region where the subnetwork will be created"
+}
+
+variable "project" {
+  type        = string
+  description = "Project ID where the subnetwork will be created"
+  default     = null
+}
+
+variable "description" {
+  type        = string
+  description = "Optional description of the subnetwork"
+  default     = null
+}
+
+variable "enable_flow_logs" {
+  type        = bool
+  description = "Whether to enable VPC Flow Logs for this subnetwork"
+  default     = false
 }
 
 variable "private_ip_google_access" {
-  description = "Enable private Google access for the subnetwork."
   type        = bool
-  default     = true
+  description = "Whether VMs without external IPs can reach Google APIs privately"
+  default     = false
 }
 
 variable "secondary_ip_ranges" {
-  description = "List of secondary IP ranges for use with GKE Pods and Services."
   type = list(object({
     range_name    = string
     ip_cidr_range = string
   }))
-  default = []
+  description = "List of secondary IP ranges for alias IPs (e.g., GKE pods/services)"
+  default     = []
 }

@@ -1,14 +1,14 @@
-terraform {
-  backend "gcs" {}
-}
+module "subnets" {
+  source   = "../../../modules/subnetwork"
+  for_each = var.subnetworks
 
-module "subnet" {
-  source = "../../../modules/subnet"
-  project_id = var.project_id
-  region     = var.region
-  name       = var.subnet_name
-  ip_cidr_range = var.ip_cidr_range
-  network_name = var.network_name
-  private_ip_google_access = var.private_ip_google_access
-  secondary_ip_ranges = var.secondary_ip_ranges
+  name                     = each.value.name
+  ip_cidr_range            = each.value.ip_cidr_range
+  network                  = each.value.network
+  region                   = each.value.region
+  project                  = each.value.project
+  description               = each.value.description
+  enable_flow_logs         = each.value.enable_flow_logs
+  private_ip_google_access = each.value.private_ip_google_access
+  secondary_ip_ranges      = each.value.secondary_ip_ranges
 }
