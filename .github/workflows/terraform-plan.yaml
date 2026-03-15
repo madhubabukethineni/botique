@@ -5,7 +5,7 @@ on:
     paths:
       - 'environments/**/**/*.tfvars'  
     branches:
-      - main  # Trigger on push to the main branch
+      - main  # Trigger on push to the main branch, test sync
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
