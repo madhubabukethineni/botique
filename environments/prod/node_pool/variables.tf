@@ -9,6 +9,6 @@ variable "node_pools" {
     default = []
 }
 variable "cluster_name" {
-  description = "The name of the GKE cluster to which the node pools will be added."
+  description = "The name of the GKE cluster to which the node pools will be added." # Testing tf file
   type        = string
 }

@@ -20,7 +20,7 @@ jobs:
       contents: read
       id-token: write
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}  # Only run for pull requests
+    if: ${{ github.event_name == 'pull_request' }}  # Only run for pull requests to test changes
  
     steps:
       # Step 1: Checkout the repository
